@@ -8,7 +8,7 @@
     "start": "NODE_ENV=production node server.js",
     "lint": "next lint",
     "seed": "ts-node prisma/seed.mjs",
-    "db": "prisma generate && prisma migrate deploy && npm run seed-prod",
+    "db": "prisma generate && prisma migrate deploy",
     "seed-prod": "ts-node prisma/seed.mjs"
   },
   "dependencies": {
