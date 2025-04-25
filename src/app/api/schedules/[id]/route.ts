@@ -1,4 +1,3 @@
-// app/api/schedules/[id]/route.ts
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
@@ -11,7 +10,6 @@ export async function DELETE(
   try {
     const id = parseInt(params.id);
     
-    // Verificar se o agendamento existe
     const schedule = await prisma.schedule.findUnique({
       where: { id }
     });
@@ -23,7 +21,6 @@ export async function DELETE(
       );
     }
     
-    // Deletar o agendamento
     await prisma.schedule.delete({
       where: { id }
     });

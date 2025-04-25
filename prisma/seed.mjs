@@ -1,15 +1,12 @@
-// prisma/seed.ts
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  // Limpar o banco de dados
   await prisma.schedule.deleteMany();
   await prisma.currentUser.deleteMany();
   await prisma.user.deleteMany();
 
-  // Criar os 7 integrantes
   const members = [
     'Integrante 1',
     'Integrante 2',

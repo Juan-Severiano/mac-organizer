@@ -1,4 +1,3 @@
-// app/api/current-user/route.ts
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
@@ -23,10 +22,8 @@ export async function POST(request: Request) {
   try {
     const { userId } = await request.json();
     
-    // Delete any existing current user
     await prisma.currentUser.deleteMany();
     
-    // Create the new current user
     const currentUser = await prisma.currentUser.create({
       data: { userId },
       include: {

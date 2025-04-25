@@ -23,7 +23,6 @@ type TimeOption = {
   label: string
 }
 
-// Gerar opções de horário em intervalos de 30 minutos
 const generateTimeOptions = (): TimeOption[] => {
   const options: TimeOption[] = []
   for (let hour = 0; hour < 24; hour++) {
@@ -32,7 +31,6 @@ const generateTimeOptions = (): TimeOption[] => {
       const m = minute.toString().padStart(2, "0")
       const value = `${h}:${m}:00`
 
-      // Formato 24h para exibição
       const label = `${h}:${minute.toString().padStart(2, "0")}`
 
       options.push({ value, label })
@@ -58,7 +56,6 @@ export function ScheduleForm() {
     e.preventDefault()
     setError(null)
 
-    // Validação
     if (!userId || !date || !startTime || !endTime) {
       setError("Por favor, preencha todos os campos")
       return
@@ -83,7 +80,6 @@ export function ScheduleForm() {
       if (result.success) {
         toast.success("Agendamento criado com sucesso")
 
-        // Resetar formulário
         setUserId("")
         setDate(undefined)
         setStartTime("")
@@ -144,7 +140,6 @@ export function ScheduleForm() {
                   initialFocus
                   locale={ptBR}
                   disabled={(date) => {
-                    // Compara apenas as datas (dia, mês, ano) sem considerar o horário
                     const today = new Date()
                     today.setHours(0, 0, 0, 0)
                     return date < today

@@ -1,4 +1,3 @@
-// app/api/schedules/route.ts
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
@@ -26,7 +25,6 @@ export async function POST(request: Request) {
   try {
     const { userId, date, startTime, endTime } = await request.json();
     
-    // Validar que o horário de término é posterior ao de início
     if (startTime >= endTime) {
       return NextResponse.json(
         { error: 'End time must be after start time' },

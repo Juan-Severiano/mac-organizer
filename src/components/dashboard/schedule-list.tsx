@@ -35,17 +35,14 @@ export function ScheduleList() {
     if (isToday(date)) return "Hoje"
     if (isTomorrow(date)) return "Amanhã"
 
-    // Formatar data em português: "24 de abril de 2025"
     return format(date, "d 'de' MMMM 'de' yyyy", { locale: ptBR })
   }
 
   const formatTime = (timeStr: string) => {
-    // Converter string de tempo (HH:MM:SS) para objeto Date para formatação
     const [hours, minutes] = timeStr.split(":").map(Number)
     const date = new Date()
     date.setHours(hours, minutes, 0)
 
-    // Formatar hora em português (formato 24h): "14:30"
     return format(date, "HH:mm", { locale: ptBR })
   }
 
