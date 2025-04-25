@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id          Int          @id @default(autoincrement())
+  name        String
+  currentUser CurrentUser?
+  schedules   Schedule[]
+}
+
+model CurrentUser {
+  id     Int  @id @default(autoincrement())
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id])
+}
+
+model Schedule {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  date      DateTime
+  startTime String
+  endTime   String
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([date, startTime, endTime])
+}
