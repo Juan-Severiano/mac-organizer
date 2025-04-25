@@ -15,7 +15,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Calendar, Clock, Loader2, Trash2, User } from "lucide-react"
-import { format, parseISO, isToday, isTomorrow, isAfter } from "date-fns"
+import { format, parseISO, isToday, isTomorrow } from "date-fns"
+import { ptBR } from "date-fns/locale"
 import { useSchedule } from "@/contexts/schedule-context"
 import { useUsers } from "@/contexts/user-context"
 import { toast } from "sonner"
@@ -26,14 +27,26 @@ export function ScheduleList() {
   const [deletingId, setDeletingId] = useState<number | null>(null)
 
   const getUserName = (userId: number) => {
-    return users.find((user) => user.id === userId)?.name || "Unknown"
+    return users.find((user) => user.id === userId)?.name || "Desconhecido"
   }
 
   const formatDate = (dateStr: string) => {
     const date = parseISO(dateStr)
-    if (isToday(date)) return "Today"
-    if (isTomorrow(date)) return "Tomorrow"
-    return format(date, "MMM d, yyyy")
+    if (isToday(date)) return "Hoje"
+    if (isTomorrow(date)) return "Amanhã"
+
+    // Formatar data em português: "24 de abril de 2025"
+    return format(date, "d 'de' MMMM 'de' yyyy", { locale: ptBR })
+  }
+
+  const formatTime = (timeStr: string) => {
+    // Converter string de tempo (HH:MM:SS) para objeto Date para formatação
+    const [hours, minutes] = timeStr.split(":").map(Number)
+    const date = new Date()
+    date.setHours(hours, minutes, 0)
+
+    // Formatar hora em português (formato 24h): "14:30"
+    return format(date, "HH:mm", { locale: ptBR })
   }
 
   const handleDelete = async (id: number) => {
@@ -41,30 +54,36 @@ export function ScheduleList() {
     try {
       const success = await deleteSchedule(id)
       if (success) {
-        toast.warning("deletado")
+        toast.success("Agendamento excluído com sucesso")
       } else {
-        throw new Error("Failed to delete schedule")
+        throw new Error("Falha ao excluir agendamento")
       }
     } catch (error) {
-      toast.warning("nao")
+      toast.error("Não foi possível excluir o agendamento")
     } finally {
       setDeletingId(null)
     }
   }
 
-  // Filter and sort schedules: today's first, then future dates
+  const now = new Date()
+
   const sortedSchedules = [...schedules]
-    .filter(
-      (schedule) =>
-        isAfter(parseISO(schedule.date), new Date()) ||
-        (isToday(parseISO(schedule.date)) && parseISO(`${schedule.date}T${schedule.endTime}`) > new Date()),
-    )
+    .filter((schedule) => {
+      const [year, month, day] = schedule.date.split("T")[0].split("-").map(Number)
+      const [endHour, endMinute] = schedule.endTime.split(":").map(Number)
+
+      const endDateTime = new Date(year, month - 1, day, endHour, endMinute)
+
+      return endDateTime > now
+    })
     .sort((a, b) => {
       const dateA = parseISO(a.date)
       const dateB = parseISO(b.date)
+
       if (dateA.getTime() !== dateB.getTime()) {
         return dateA.getTime() - dateB.getTime()
       }
+
       return a.startTime.localeCompare(b.startTime)
     })
 
@@ -79,7 +98,7 @@ export function ScheduleList() {
   if (sortedSchedules.length === 0) {
     return (
       <Card className="flex h-32 items-center justify-center border-dashed">
-        <CardContent className="text-center text-muted-foreground">No upcoming schedules found</CardContent>
+        <CardContent className="text-center text-muted-foreground">Nenhum agendamento encontrado</CardContent>
       </Card>
     )
   }
@@ -103,8 +122,7 @@ export function ScheduleList() {
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Clock className="h-4 w-4" />
                 <span>
-                  {format(parseISO(`2000-01-01T${schedule.startTime}`), "h:mm a")} -
-                  {format(parseISO(`2000-01-01T${schedule.endTime}`), "h:mm a")}
+                  {formatTime(schedule.startTime)} - {formatTime(schedule.endTime)}
                 </span>
               </div>
             </div>
@@ -117,18 +135,18 @@ export function ScheduleList() {
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Delete Schedule</AlertDialogTitle>
+                  <AlertDialogTitle>Excluir Agendamento</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Are you sure you want to delete this schedule? This action cannot be undone.
+                    Tem certeza que deseja excluir este agendamento? Esta ação não pode ser desfeita.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
                   <AlertDialogAction
                     onClick={() => handleDelete(schedule.id)}
                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                   >
-                    {deletingId === schedule.id ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete"}
+                    {deletingId === schedule.id ? <Loader2 className="h-4 w-4 animate-spin" /> : "Excluir"}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
