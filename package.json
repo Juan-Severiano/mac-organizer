@@ -7,8 +7,10 @@
     "build": "npm run db ; next build",
     "start": "NODE_ENV=production node server.js",
     "lint": "next lint",
-    "seed": "ts-node prisma/seed.mjs",
-    "db": "npx prisma generate ; npx prisma migrate dev --name init ; npm run seed"
+    "seed": "node prisma/seed.js",
+    "db": "npx prisma generate ; npx prisma migrate deploy ; npm run seed",
+    "vercel-build": "prisma generate && prisma migrate deploy && npm run seed-prod",
+    "seed-prod": "node prisma/seed.js"
   },
   "dependencies": {
     "@prisma/client": "^6.6.0",
