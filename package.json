@@ -8,8 +8,7 @@
     "start": "NODE_ENV=production node server.js",
     "lint": "next lint",
     "seed": "node prisma/seed.js",
-    "db": "npx prisma generate ; npx prisma migrate deploy ; npm run seed",
-    "vercel-build": "prisma generate && prisma migrate deploy && npm run seed-prod",
+    "db": "prisma generate && prisma migrate deploy && npm run seed-prod",
     "seed-prod": "node prisma/seed.js"
   },
   "dependencies": {
